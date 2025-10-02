@@ -45,15 +45,9 @@ class RaceRepository(IRaceRepository):
     async def create(self, entity: CreateRace) -> BaseRace:
         try:
             entity_to_add = convert_create_to_postgres(entity)
-            query = select(RacePostgresDB).where(RacePostgresDB.season_id==entity.season_id,
-                                               RacePostgresDB.country==entity.country,
-                                               RacePostgresDB.date==entity.date,
-                                               RacePostgresDB.laps_count==entity.laps_count,
-                                               RacePostgresDB.track_id==entity.track_id)
-            result = await self._session.scalars(query)
-            result = result.first()
-            if result is not None:
-                raise RaceAlreadyExistException(f"Race with id {entity_to_add.id} already exists")
+            duplicate = await self.__check_duplicates_without_id(entity_to_add)
+            if duplicate is not None:
+                raise RaceAlreadyExistException(f"Race with such parameters and  id {duplicate.id} already exists")
             self._session.add(entity_to_add)
             await self._session.commit()
             return convert_postgres_to_model(entity_to_add)
@@ -72,8 +66,13 @@ class RaceRepository(IRaceRepository):
             to_merge.country = entity.country if entity.country is not None else to_merge.country
             to_merge.season_id = entity.season_id if entity.season_id is not None else to_merge.season_id
 
+            duplicate = await self.__check_duplicates_without_id(to_merge)
+
+            if duplicate is not None:
+                raise RaceAlreadyExistException(f"Race with such parameters and another id {result.id} already exists")
+
             merged = await self._session.merge(to_merge)
-            await self._session.flush()
+            await self._session.commit()
             return convert_postgres_to_model(merged)
         except Exception as e:
             raise e
@@ -97,3 +96,12 @@ class RaceRepository(IRaceRepository):
                 return [convert_postgres_to_model(race) for race in races]
         except Exception as e:
             raise e
+
+    async def __check_duplicates_without_id(self, entity: RacePostgresDB) -> Optional[RacePostgresDB]:
+        query = select(RacePostgresDB).where(RacePostgresDB.season_id == entity.season_id,
+                                             RacePostgresDB.country == entity.country,
+                                             RacePostgresDB.date == entity.date,
+                                             RacePostgresDB.laps_count == entity.laps_count,
+                                             RacePostgresDB.track_id == entity.track_id)
+        result = await self._session.scalars(query)
+        return result.first()
