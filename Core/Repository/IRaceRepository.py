@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, TypeVar, Generic
+from typing import List, Optional
+
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 import uuid
 
@@ -7,11 +9,10 @@ from Core.Models.Race.BaseRace import BaseRace
 from Core.Models.Race.CreateRace import CreateRace
 from Core.Models.Race.UpdateRace import UpdateRace
 
-T = TypeVar('T')
 
 class IRaceRepository(ABC):
     @abstractmethod
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         pass
 
     @abstractmethod

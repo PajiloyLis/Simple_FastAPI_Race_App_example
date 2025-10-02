@@ -22,6 +22,7 @@ class RaceController:
         self.router.add_api_route("/{race_id}", endpoint=self.get, methods=["GET"], response_model=RaceDTO)
         self.router.add_api_route("/create", endpoint=self.create, methods=["POST"], response_model=RaceDTO)
         self.router.add_api_route("/update", endpoint=self.update, methods=["PUT"], response_model=RaceDTO)
+        self.router.add_api_route("/{race_id}", endpoint=self.delete, methods=["DELETE"], response_model=None)
         self.race_service = race_service
 
     async def get(self, race_id: uuid.UUID = Path()) -> RaceDTO:
@@ -75,6 +76,17 @@ class RaceController:
         try:
             races = await self.race_service.get_race_in_season(season_id)
             return [convert_model_to_dto(race) for race in races]
+        except RaceNotFoundException as e:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        except RaceAlreadyExistException as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+    async def delete(self, race_id: uuid.UUID = Path()) -> JSONResponse:
+        try:
+            await self.race_service.delete(race_id)
+            return JSONResponse(content=None, status_code=status.HTTP_204_NO_CONTENT)
         except RaceNotFoundException as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
         except RaceAlreadyExistException as e:

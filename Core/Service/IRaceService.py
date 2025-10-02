@@ -11,7 +11,7 @@ from Core.Repository.IRaceRepository import IRaceRepository
 
 class IRaceService(ABC):
     @abstractmethod
-    def __init__(self, base_repository: IRaceRepository):
+    def __init__(self, base_repository: IRaceRepository) -> None:
         pass
 
     @abstractmethod

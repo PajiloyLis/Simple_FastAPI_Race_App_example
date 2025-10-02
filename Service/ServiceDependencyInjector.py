@@ -1,11 +1,13 @@
-from fastapi import Depends
-
-from Core.Repository.IRaceRepository import IRaceRepository
 from Core.Service.IRaceService import IRaceService
-from Database.DatabaseDependencyInjector import get_race_repository
-from Database.Repository.RacePostgresRepository import RaceRepository
+from Core.Service.ITrackService import ITrackService
+from Database.DatabaseDependencyInjector import get_race_repository, get_track_repository
 from Service.RaceService import RaceService
+from Service.TrackService import TrackService
 
 
-def get_race_service(repository: IRaceRepository = Depends(get_race_repository)) -> RaceService:
-    return RaceService(repository)
+async def get_race_service() -> IRaceService:
+    return RaceService(await get_race_repository())
+
+
+async def get_track_service() -> ITrackService:
+    return TrackService(await get_track_repository())

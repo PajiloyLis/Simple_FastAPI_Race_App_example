@@ -14,16 +14,22 @@ def convert_model_to_postgres(entity: BaseRace) -> RacePostgresDB:
 
 
 def convert_model_to_dto(entity: BaseRace) -> RaceDTO:
-    return RaceDTO(id=entity.id, track_id=entity.track_id, season_id=entity.season_id, country=entity.country, laps_count=entity.laps_count, date=entity.date)
+    return RaceDTO(id=entity.id, track_id=entity.track_id, season_id=entity.season_id, country=entity.country,
+                   laps_count=entity.laps_count, date=entity.date)
+
 
 def convert_postgres_to_model(entity: RacePostgresDB) -> BaseRace:
     return BaseRace(entity.id, entity.track_id, entity.date, entity.laps_count, entity.season_id, entity.country)
 
+
 def convert_create_to_postgres(entity: CreateRace) -> RacePostgresDB:
-    return RacePostgresDB(uuid.uuid4(), entity.track_id, entity.date, entity.laps_count, entity.season_id, entity.country)
+    return RacePostgresDB(uuid.uuid4(), entity.track_id, entity.date, entity.laps_count, entity.season_id,
+                          entity.country)
+
 
 def convert_dto_to_create(entity: CreateRaceDTO) -> CreateRace:
     return CreateRace(entity.track_id, entity.date, entity.laps_count, entity.season_id, entity.country)
+
 
 def convert_dto_to_update(entity: UpdateRaceDTO) -> UpdateRace:
     return UpdateRace(entity.id, entity.track_id, entity.date, entity.laps_count, entity.season_id, entity.country)
