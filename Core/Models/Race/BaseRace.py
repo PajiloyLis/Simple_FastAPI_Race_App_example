@@ -1,12 +1,10 @@
 import uuid
-from datetime import datetime, date
-
-from Database.Models.RacePostgresDB import RacePostgresDB
-from HttpServer.Dto.RaceDTO.RaceDTO import RaceDTO
+from datetime import datetime
 
 
 class BaseRace:
-    def __init__(self, id: uuid.UUID, track_id: uuid.UUID, date: datetime, laps_count: int, season_id: uuid.UUID, country: str) -> None:
+    def __init__(self, id: uuid.UUID, track_id: uuid.UUID, date: datetime, laps_count: int, season_id: uuid.UUID,
+                 country: str) -> None:
         if not isinstance(id, uuid.UUID):
             raise ValueError("id must be of type UUID")
         if not isinstance(date, datetime) or date > datetime.now():
@@ -25,8 +23,4 @@ class BaseRace:
         self.season_id = season_id
         self.country = country
 
-    def convert_postgres(self) -> RacePostgresDB:
-        return RacePostgresDB(self.id, self.track_id, self.date, self.laps_count, self.season_id, self.country)
 
-    def convert(self) -> RaceDTO:
-        return RaceDTO(self.id, self.track_id, self.season_id, self.country, self.laps_count, self.date)

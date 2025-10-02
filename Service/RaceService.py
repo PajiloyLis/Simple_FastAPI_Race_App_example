@@ -1,7 +1,9 @@
 import uuid
-from typing import Optional, List, Any, Coroutine
+from typing import Optional, List
 
-from Core.Models.Race import BaseRace, CreateRace, UpdateRace
+from Core.Models.Race.BaseRace import BaseRace
+from Core.Models.Race.CreateRace import CreateRace
+from Core.Models.Race.UpdateRace import UpdateRace
 from Core.Repository.IRaceRepository import IRaceRepository
 from Core.Service.IRaceService import IRaceService
 

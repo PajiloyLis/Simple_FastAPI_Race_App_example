@@ -6,13 +6,13 @@ from Core.Common.Singleton import SingletonMeta
 load_dotenv()
 
 class Settings(metaclass=SingletonMeta):
-    database_url = None
-    host = None
-    port = None
     def __init__(self):
+        self.database_url = None
+        self.host = None
+        self.port = None
         self.load_settings()
 
-    async def load_settings(self):
-        database_url = os.getenv("DB_URL")
-        host = os.getenv("HOST")
-        port = os.getenv("PORT")
+    def load_settings(self):
+        self.database_url = str(os.getenv("DB_URL"))
+        self.host = str(os.getenv("HOST"))
+        self.port = int(os.getenv("PORT"))

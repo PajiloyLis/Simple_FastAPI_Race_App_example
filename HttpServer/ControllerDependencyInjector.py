@@ -2,6 +2,7 @@ from fastapi import Depends
 
 from Core.Service.IRaceService import IRaceService
 from HttpServer.Controller.RaceController import RaceController
+from Service.RaceService import RaceService
 from Service.ServiceDependencyInjector import get_race_service
 
 

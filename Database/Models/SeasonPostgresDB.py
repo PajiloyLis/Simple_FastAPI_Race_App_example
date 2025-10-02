@@ -1,37 +1,24 @@
+import uuid
 from sqlalchemy import (Column,
-                        ForeignKey,
-                        Integer,
-                        String,
-                        DateTime,
-                        UUID)
-from BaseModel import BaseModel
-from uuid import uuid4
+                        Integer)
+from sqlalchemy.dialects.postgresql import UUID
+
+from Database.Models.BaseModel import BaseModel
+
 
 class SeasonPostgresDB(BaseModel):
     __tablename__ = 'seasons'
 
-    __id = Column(UUID, primary_key=True, default=uuid4)
-    __year = Column(DateTime, nullable=False)
+    id = Column(UUID, primary_key=True, default=uuid.uuid4)
+    year = Column(Integer, nullable=False)
 
-    def __init__(self, id: UUID, year: DateTime) -> None:
-        if not isinstance(id, UUID):
+    def __init__(self, id: uuid.UUID, year: int) -> None:
+        if not isinstance(id, uuid.UUID):
             raise ValueError("id must be of type UUID")
-        if not isinstance(year, DateTime):
-            raise ValueError("year must be of type DateTime")
+        if not isinstance(year, int):
+            raise ValueError("year must be of type Integer")
 
         super().__init__()
 
-        __id = id
-        __year = year
-
-    @property
-    def id(self) -> UUID:
-        return self.__id
-
-    @property
-    def year(self) -> DateTime:
-        return self.__year
-
-    @year.setter
-    def year(self, year: DateTime) -> None:
-        self.__year = year
+        self.id = id
+        self.year = year

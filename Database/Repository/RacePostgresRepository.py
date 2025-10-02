@@ -1,11 +1,16 @@
-from abc import ABC, abstractmethod
-from typing import List, Optional, TypeVar, Generic
-from sqlalchemy.orm import Session
+from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+
+from Core.Models.Race.CreateRace import CreateRace
+from Core.Models.Race.RaceConverter import (convert_create_to_postgres,
+                                            convert_model_to_postgres,
+                                            convert_postgres_to_model)
 import uuid
 
-from Core.Models.Race import CreateRace, UpdateRace, BaseRace
+from Core.Models.Race.BaseRace import BaseRace
+from Core.Models.Race.UpdateRace import UpdateRace
+
 from Core.Repository.IRaceRepository import IRaceRepository
 from Database.Models.RacePostgresDB import RacePostgresDB
 from Core.Exceptions.RaceNotFoundException import RaceNotFoundException
@@ -21,29 +26,37 @@ class RaceRepository(IRaceRepository):
             result = await self._session.get(RacePostgresDB, id)
             if result is None:
                 raise RaceNotFoundException(f"Race with id {id} not found")
-            return result.convert_postgres()
+            return convert_postgres_to_model(result)
         except Exception as e:
             raise e
 
-    async def get_all(self) -> Optional[List[BaseRace]]:
+    async def get_all(self) -> List[BaseRace]:
         try:
             stmt = select(RacePostgresDB)
             result = await self._session.scalars(stmt)
             races = result.all()
             if races is not None:
-                return [race.convert_postgres() for race in races]
+                return [convert_postgres_to_model(race) for race in races]
+            else:
+                raise RaceNotFoundException(f"Races not found")
         except Exception as e:
             raise e
 
     async def create(self, entity: CreateRace) -> BaseRace:
         try:
-            entity_to_add = entity.convert_postgres()
-            result = await self._session.get(RacePostgresDB, entity_to_add.id)
+            entity_to_add = convert_create_to_postgres(entity)
+            query = select(RacePostgresDB).where(RacePostgresDB.season_id==entity.season_id,
+                                               RacePostgresDB.country==entity.country,
+                                               RacePostgresDB.date==entity.date,
+                                               RacePostgresDB.laps_count==entity.laps_count,
+                                               RacePostgresDB.track_id==entity.track_id)
+            result = await self._session.scalars(query)
+            result = result.first()
             if result is not None:
                 raise RaceAlreadyExistException(f"Race with id {entity_to_add.id} already exists")
             self._session.add(entity_to_add)
-            await self._session.flush()
-            return entity_to_add.convert_postgres()
+            await self._session.commit()
+            return convert_postgres_to_model(entity_to_add)
         except Exception as e:
             raise e
 
@@ -59,9 +72,9 @@ class RaceRepository(IRaceRepository):
             to_merge.country = entity.country if entity.country is not None else to_merge.country
             to_merge.season_id = entity.season_id if entity.season_id is not None else to_merge.season_id
 
-            merged = await self._session.merge(entity)
+            merged = await self._session.merge(to_merge)
             await self._session.flush()
-            return merged
+            return convert_postgres_to_model(merged)
         except Exception as e:
             raise e
 
@@ -81,6 +94,6 @@ class RaceRepository(IRaceRepository):
             result = await self._session.scalars(stmt)
             races = list(result.all())
             if races is not None:
-                return [race.convert_postgres() for race in races]
+                return [convert_postgres_to_model(race) for race in races]
         except Exception as e:
             raise e

@@ -1,7 +1,5 @@
 import uuid
-from datetime import datetime, date
-
-from Database.Models.RacePostgresDB import RacePostgresDB
+from datetime import datetime
 
 
 class UpdateRace:

@@ -1,7 +1,5 @@
 import uuid
-from datetime import datetime, date
-
-from Database.Models.RacePostgresDB import RacePostgresDB
+from datetime import datetime
 
 
 class CreateRace:
@@ -20,6 +18,3 @@ class CreateRace:
         self.laps_count = laps_count
         self.season_id = season_id
         self.country = country
-
-    def convert_postgres(self) -> RacePostgresDB:
-        return RacePostgresDB(uuid.uuid4(), self.track_id, self.date, self.laps_count, self.season_id, self.country)

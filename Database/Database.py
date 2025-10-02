@@ -42,7 +42,6 @@ class Database(metaclass=SingletonMeta):
             self.__session_factory = None
             self.__is_connected = False
 
-    @contextmanager
     def get_session(self) -> AsyncSession:
         if not self.__is_connected:
             raise RuntimeError("Database is not connected. Call connect() first.")

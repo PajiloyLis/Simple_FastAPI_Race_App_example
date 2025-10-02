@@ -1,7 +1,4 @@
 class SingletonMeta(type):
-    """
-    Metaclass для создания синглтонов
-    """
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
