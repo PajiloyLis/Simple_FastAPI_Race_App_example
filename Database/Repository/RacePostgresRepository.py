@@ -82,6 +82,7 @@ class RaceRepository(IRaceRepository):
             entity = await self.get_by_id(id)
             if entity:
                 await self._session.delete(entity)
+                await self._session.commit()
             else:
                 raise RaceNotFoundException(f"Race with id {id} not found")
         except Exception as e:

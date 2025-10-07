@@ -76,6 +76,7 @@ class TrackRepository(ITrackRepository):
             if entity is None:
                 raise TrackNotFoundException(f"Track with id {id} not found")
             await self._session.delete(entity)
+            await self._session.commit()
         except TrackNotFoundException as e:
             raise e
         except Exception as e:
